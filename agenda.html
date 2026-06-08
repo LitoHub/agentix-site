@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda tu demo — Agentix</title>
+<meta name="description" content="Elige el horario de tu demo de Agentix. Te enviamos la invitación con el enlace de la llamada al instante.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="agenda.css?v=2">
+</head>
+<body class="agenda-body">
+
+<!-- ============================================================ NAV ===== -->
+<header class="nav scrolled" id="nav">
+  <div class="nav-inner">
+    <a href="index.html#top" class="brand"><img src="assets/logo.svg" alt=""> Agentix</a>
+    <a href="index.html" class="cta-ghost back-link">← Volver al sitio</a>
+  </div>
+</header>
+
+<main class="agenda-main">
+  <section class="wrap agenda-wrap">
+
+    <!-- Encabezado -->
+    <div class="agenda-head">
+      <span class="eyebrow">Último paso</span>
+      <h1>Elige el horario de tu demo.</h1>
+      <p class="lead">Una llamada corta de 30 minutos. Apenas confirmes, te llega la invitación con el enlace a tu correo.</p>
+    </div>
+
+    <!-- Calendario nativo (mes) -->
+    <div class="agenda-cal" id="calCard">
+
+      <!-- Estado: cargando -->
+      <div class="cal-state" id="calLoading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Buscando horarios disponibles…</p>
+      </div>
+
+      <!-- Estado: error de carga -->
+      <div class="cal-state" id="calError" hidden>
+        <div class="state-ic err" aria-hidden="true">!</div>
+        <p id="calErrorMsg">No pudimos cargar los horarios.</p>
+        <button class="cta-ghost" id="retryBtn" type="button">Reintentar</button>
+      </div>
+
+      <!-- Estado: picker (mes + horarios) -->
+      <div class="cal-picker" id="calPicker" hidden>
+        <div class="cal-panes">
+
+          <!-- Panel: calendario del mes -->
+          <div class="cal-month">
+            <div class="month-head">
+              <button class="month-nav" id="prevMonth" type="button" aria-label="Mes anterior">‹</button>
+              <h2 class="month-label" id="monthLabel">—</h2>
+              <button class="month-nav" id="nextMonth" type="button" aria-label="Mes siguiente">›</button>
+            </div>
+            <div class="weekday-row" aria-hidden="true">
+              <span>lu</span><span>ma</span><span>mi</span><span>ju</span><span>vi</span><span>sá</span><span>do</span>
+            </div>
+            <div class="month-grid" id="monthGrid" role="grid" aria-label="Días del mes"></div>
+            <p class="cal-tz" id="calTz"><span class="ic-dot"></span>Hora de Colombia</p>
+          </div>
+
+          <!-- Panel lateral: horarios del día + confirmación -->
+          <div class="cal-side">
+            <div class="side-empty" id="sideEmpty">
+              <span class="side-empty-ic" aria-hidden="true">📅</span>
+              <p>Elige un día disponible para ver los horarios.</p>
+            </div>
+
+            <div class="side-slots" id="sideSlots" hidden>
+              <div class="slot-head">
+                <span id="slotDayLabel">Horarios</span>
+                <span class="slot-scarcity" id="slotScarcity" hidden></span>
+              </div>
+              <div class="slot-grid" id="slotGrid" role="listbox" aria-label="Horarios disponibles"></div>
+              <div class="slot-empty" id="slotEmpty" hidden>No quedan horarios este día. Prueba con otro.</div>
+            </div>
+
+            <div class="cal-confirm" id="confirmArea" hidden>
+              <div class="confirm-summary" id="confirmSummary">
+                <span class="ic-cal" aria-hidden="true">🗓️</span>
+                <span id="confirmText"></span>
+              </div>
+              <div class="confirm-fields">
+                <div class="field">
+                  <label for="a-name">Tu nombre</label>
+                  <input id="a-name" name="name" type="text" placeholder="Ej. Camila Restrepo" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="a-email">Tu correo</label>
+                  <input id="a-email" name="email" type="email" placeholder="tu@correo.com" autocomplete="email" required>
+                  <span class="field-note">Aquí te llega la invitación con el enlace.</span>
+                </div>
+                <!-- Honeypot anti-spam: oculto para humanos, los bots lo llenan -->
+                <div class="hp-field" aria-hidden="true">
+                  <label for="a-website">No llenes esto</label>
+                  <input id="a-website" name="website" type="text" tabindex="-1" autocomplete="off">
+                </div>
+              </div>
+              <button class="cta lg confirm-btn" id="confirmBtn" type="button">
+                Confirmar mi demo <span class="arrow" aria-hidden="true">→</span>
+              </button>
+              <p class="confirm-note" id="confirmNote">Te llega la invitación al confirmar.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Estado: éxito -->
+      <div class="cal-state success" id="calSuccess" hidden>
+        <div class="state-ic ok" aria-hidden="true">✓</div>
+        <h2>¡Tu demo quedó agendada!</h2>
+        <div class="success-card" id="successDetails"></div>
+        <p class="success-note">Te enviamos la invitación a <b id="successEmail"></b> con el enlace de la videollamada. Revisa tu correo (y la carpeta de spam, por si acaso).</p>
+        <a href="index.html" class="cta-ghost">Volver al sitio</a>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- ========================================================== FOOTER ===== -->
+<footer class="footer wrap agenda-footer">
+  <div class="footer-base">
+    <span>© 2026 Agentix. Todos los derechos reservados.</span>
+    <span class="made">Hecho por <b>Parallelo.ai</b></span>
+  </div>
+</footer>
+
+<script src="agenda.js?v=2"></script>
+</body>
+</html>

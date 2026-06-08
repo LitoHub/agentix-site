@@ -1,0 +1,167 @@
+/* ===========================================================================
+   Agentix — Página de agenda (calendario nativo de MES)
+   Reusa tokens de styles.css. Solo estilos propios de esta página.
+   =========================================================================== */
+
+.agenda-body { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* El atributo [hidden] debe ganar sobre display:flex/grid de los estados. */
+[hidden] { display: none !important; }
+
+/* Nav simplificada en esta página */
+.agenda-body .nav-inner { gap: 16px; }
+.back-link { margin-left: auto; }
+
+/* ------------------------------------------------------------- Layout --- */
+.agenda-main { flex: 1; padding-top: clamp(104px, 14vw, 148px); padding-bottom: clamp(48px, 8vw, 80px); }
+.agenda-wrap { width: 100%; }
+
+.agenda-head { max-width: 640px; margin: 0 auto; text-align: center; }
+.agenda-head .eyebrow { justify-content: center; }
+.agenda-head h1 { margin-top: 16px; font-size: clamp(2rem, 4.4vw, 2.9rem); }
+.agenda-head .lead { margin-top: 16px; }
+
+/* Honeypot: fuera de la vista pero accesible al DOM */
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ----------------------------------------------------- Tarjeta calendario --- */
+.agenda-cal {
+  background: var(--brand-white);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lift);
+  padding: clamp(20px, 3vw, 30px);
+  margin: clamp(28px, 5vw, 44px) auto 0;
+  max-width: 880px;
+  min-height: 440px;
+  display: flex; flex-direction: column;
+}
+
+/* Estados (loading / error / success) centrados */
+.cal-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 48px 8px; }
+.cal-state p { color: var(--text-secondary); max-width: 38ch; }
+
+.spinner { width: 38px; height: 38px; border-radius: 50%; border: 3px solid rgba(255,109,41,0.18); border-top-color: var(--brand-orange); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
+
+.state-ic { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 1.7rem; font-weight: 700; }
+.state-ic.ok { background: rgba(52,199,89,0.14); color: #2a9d4e; }
+.state-ic.err { background: rgba(255,109,41,0.14); color: var(--brand-orange); }
+
+/* --------------------------------------------------------------- Panes --- */
+.cal-panes { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(20px, 3vw, 36px); flex: 1; }
+
+/* Panel del mes */
+.month-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.month-label { font-size: 1.12rem; font-weight: 600; letter-spacing: -0.01em; text-transform: capitalize; }
+.month-nav {
+  width: 38px; height: 38px; border-radius: 50%; flex: none;
+  border: 1.5px solid rgba(69,48,39,0.14); background: var(--brand-white);
+  font-size: 1.25rem; line-height: 1; color: var(--text-primary);
+  display: grid; place-items: center; transition: border-color .16s, background .16s, opacity .16s;
+}
+.month-nav:hover:not(:disabled) { border-color: var(--brand-orange); background: var(--orange-tint); }
+.month-nav:disabled { opacity: 0.3; cursor: default; }
+
+.weekday-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px; }
+.weekday-row span { text-align: center; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.day-cell {
+  position: relative; aspect-ratio: 1 / 1; min-height: 40px;
+  display: grid; place-items: center;
+  border-radius: var(--r-sm); border: 1.5px solid transparent;
+  font-size: 0.96rem; font-weight: 500; color: var(--text-primary);
+  background: transparent; transition: background .14s, border-color .14s, color .14s, transform .1s;
+}
+.day-cell.empty { visibility: hidden; }
+.day-cell.disabled { color: var(--text-muted); opacity: 0.45; cursor: default; }
+.day-cell.available { background: var(--surface-cream); border-color: rgba(255,109,41,0.22); cursor: pointer; font-weight: 600; }
+.day-cell.available:hover { border-color: var(--brand-orange); transform: translateY(-1px); }
+.day-cell.available::after {
+  content: ""; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--brand-orange);
+}
+.day-cell.selected { background: var(--surface-dark); border-color: var(--surface-dark); color: var(--brand-white); }
+.day-cell.selected::after { background: var(--orange-soft); }
+.day-cell.today:not(.selected) { box-shadow: inset 0 0 0 1.5px rgba(69,48,39,0.25); }
+
+.cal-tz { margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 7px; }
+.ic-dot { width: 7px; height: 7px; border-radius: 50%; background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,0.18); flex: none; }
+
+/* ------------------------------------------------------- Panel lateral --- */
+.cal-side { display: flex; flex-direction: column; border-left: 1px solid rgba(69,48,39,0.10); padding-left: clamp(0px, 2vw, 28px); }
+@media (max-width: 720px) { .cal-side { border-left: none; padding-left: 0; } }
+
+.side-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; color: var(--text-muted); padding: 24px 8px; }
+.side-empty-ic { font-size: 1.8rem; opacity: 0.7; }
+.side-empty p { max-width: 26ch; font-size: 0.92rem; }
+
+.slot-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+#slotDayLabel { font-size: 0.96rem; font-weight: 600; color: var(--text-primary); text-transform: capitalize; }
+.slot-scarcity { font-size: 0.76rem; font-weight: 600; color: var(--brand-orange); background: var(--orange-tint); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 9px; }
+.slot-btn {
+  padding: 12px 8px; border-radius: var(--r-md);
+  border: 1.5px solid rgba(69,48,39,0.14); background: var(--brand-white);
+  font-size: 0.94rem; font-weight: 500; color: var(--text-primary);
+  transition: border-color .16s, background .16s, color .16s, transform .12s;
+}
+.slot-btn:hover { border-color: var(--brand-orange); transform: translateY(-1px); }
+.slot-btn[aria-selected="true"] { background: var(--brand-orange); border-color: var(--brand-orange); color: #fff; box-shadow: 0 6px 16px rgba(255,109,41,0.32); }
+.slot-empty { padding: 24px 8px; text-align: center; color: var(--text-muted); font-size: 0.92rem; }
+
+/* Confirmación */
+.cal-confirm { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(69,48,39,0.10); }
+.confirm-summary { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-cream); border: 1px solid rgba(69,48,39,0.10); margin-bottom: 14px; font-size: 0.94rem; }
+.confirm-summary b { color: var(--text-primary); }
+.confirm-fields { display: grid; gap: 12px; margin-bottom: 14px; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); }
+.field input { width: 100%; padding: 11px 13px; border-radius: var(--r-md); border: 1.5px solid rgba(69,48,39,0.16); background: var(--brand-white); font-size: 0.96rem; font-family: inherit; color: var(--text-primary); transition: border-color .16s, box-shadow .16s; }
+.field input:focus { outline: none; border-color: var(--brand-orange); box-shadow: 0 0 0 4px rgba(255,109,41,0.14); }
+.field-note { font-size: 0.76rem; color: var(--text-muted); }
+
+.confirm-btn { width: 100%; justify-content: center; }
+.confirm-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
+.confirm-note { margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); text-align: center; }
+.confirm-note.err { color: #d23b1f; }
+
+.confirm-btn.loading { position: relative; color: transparent; }
+.confirm-btn.loading::after {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 20px; height: 20px;
+  border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  animation: spin .7s linear infinite;
+}
+
+/* Éxito */
+.success-card { width: 100%; max-width: 380px; background: var(--surface-cream); border: 1px solid rgba(69,48,39,0.12); border-radius: var(--r-md); padding: 18px 20px; display: grid; gap: 8px; text-align: left; }
+.success-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem; }
+.success-row .k { color: var(--text-muted); min-width: 78px; }
+.success-row .v { color: var(--text-primary); font-weight: 500; }
+.success-note { font-size: 0.9rem; }
+.success-note b { color: var(--brand-orange); }
+
+/* Toast (slot tomado, etc.) */
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); background: var(--surface-dark); color: var(--text-on-dark); padding: 13px 20px; border-radius: var(--r-pill); box-shadow: var(--shadow-dark); font-size: 0.92rem; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 80; max-width: 90vw; text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Footer simplificado */
+.agenda-footer { padding-block: 32px 28px; }
+.agenda-footer .footer-base { margin-top: 0; }
+
+/* ----------------------------------------------------------- Responsive --- */
+@media (max-width: 720px) {
+  .cal-panes { grid-template-columns: 1fr; gap: 22px; }
+  .cal-side { border-top: 1px solid rgba(69,48,39,0.10); padding-top: 20px; }
+  .agenda-cal { min-height: 0; }
+  /* en móvil el panel lateral va debajo del mes; el "elige un día" se oculta
+     hasta que haya día elegido para no dejar un hueco vacío */
+  .cal-side .side-empty { padding: 8px; }
+}
+@media (max-width: 420px) {
+  .day-cell { min-height: 36px; font-size: 0.9rem; }
+  .slot-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+}

@@ -57,7 +57,7 @@
     }
   }
 
-  /* ---- Formulario de demo (placeholder: muestra confirmación) ---- */
+  /* ---- Formulario de demo: guarda los datos y lleva al calendario ---- */
   var form = document.getElementById('demoForm');
   if (form) {
     form.addEventListener('submit', function (ev) {
@@ -66,8 +66,23 @@
         form.reportValidity();
         return;
       }
-      // TODO: cablear a Calendly / correo / CRM real.
+      // Persistimos lo que llenó el lead para prellenar la página de agenda.
+      var lead = {
+        name: (form.elements.name && form.elements.name.value || '').trim(),
+        agency: (form.elements.agency && form.elements.agency.value || '').trim(),
+        email: (form.elements.email && form.elements.email.value || '').trim(),
+        clients: (form.elements.clients && form.elements.clients.value || '').trim()
+      };
+      try { sessionStorage.setItem('agentix_lead', JSON.stringify(lead)); } catch (e) {}
+
+      // Confirmación breve antes de redirigir (mejora la percepción de respuesta).
       form.classList.add('sent');
+
+      var query = '?name=' + encodeURIComponent(lead.name) +
+                  '&email=' + encodeURIComponent(lead.email);
+      window.setTimeout(function () {
+        window.location.href = 'agenda.html' + query;
+      }, reduce ? 0 : 450);
     });
   }
 })();

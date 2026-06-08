@@ -1,0 +1,22 @@
+# Configuración de Netlify para el sitio de Agentix.
+# Publica los archivos estáticos de esta carpeta y expone las Functions en /api/*.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# /api/availability → /.netlify/functions/availability  (y /api/book, etc.)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# El HTML siempre se revalida → al desplegar, los usuarios ven la última versión
+# (y por tanto el ?v=N actualizado de CSS/JS).
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
