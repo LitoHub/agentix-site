@@ -8,7 +8,7 @@
 var GMAIL_USER = process.env.GMAIL_USER || '';
 var GMAIL_APP_PASSWORD = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
 var ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@parallelo.com.co';
-var FROM_NAME = process.env.EMAIL_FROM_NAME || 'Agentix';
+var FROM_NAME = process.env.EMAIL_FROM_NAME || 'Agentix by Parallelo AI';
 
 var ORANGE = '#FF6D29';
 var DARK = '#1F1815';
